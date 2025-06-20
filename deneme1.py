@@ -64,6 +64,10 @@ class BahisButtonClicker:
         
     def setup_driver(self):
         """Chrome WebDriver'ı kurulum - Headless mode ile"""
+        # Import'ları fonksiyon başında yap
+        import glob
+        import os
+        
         chrome_options = Options()
         
         # Her durumda headless mode
@@ -97,10 +101,6 @@ class BahisButtonClicker:
             log_with_timestamp("📦 ChromeDriver indiriliyor...")
             driver_path = ChromeDriverManager().install()
             log_with_timestamp(f"📍 ChromeDriver path: {driver_path}")
-            
-            # Path içinde gerçek chromedriver binary'sini bul
-            import glob
-            import os
             
             if os.path.isdir(driver_path):
                 # Eğer directory döndüyse, içindeki chromedriver binary'sini bul
