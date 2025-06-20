@@ -4,7 +4,9 @@
     "builder": "DOCKERFILE"
   },
   "deploy": {
-    "startCommand": "python deneme1.py",
-    "restartPolicyType": "ALWAYS"
+    "startCommand": "python app.py",
+    "restartPolicyType": "ALWAYS",
+    "healthcheckPath": "/status",
+    "healthcheckTimeout": 100
   }
 } 
