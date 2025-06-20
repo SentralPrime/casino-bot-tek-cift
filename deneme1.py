@@ -3,6 +3,8 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.service import Service
 import time
 import random
 import os
@@ -91,7 +93,9 @@ class BahisButtonClicker:
             log_with_timestamp("🚂 Railway ortamı tespit edildi - Optimize edilmiş ayarlar kullanılıyor")
         
         try:
-            self.driver = webdriver.Chrome(options=chrome_options)
+            # webdriver-manager ile otomatik ChromeDriver yönetimi
+            service = Service(ChromeDriverManager().install())
+            self.driver = webdriver.Chrome(service=service, options=chrome_options)
             self.driver.set_window_size(1920, 1080)
             log_with_timestamp("✅ Chrome WebDriver başlatıldı (Headless Mode)")
         except Exception as e:

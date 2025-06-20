@@ -10,19 +10,15 @@ RUN apt-get update && apt-get install -y \
     xvfb \
     && rm -rf /var/lib/apt/lists/*
 
-# Google Chrome'u yükle
+# Google Chrome'u yükle (güncel versiyon)
 RUN wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | apt-key add - \
     && echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" >> /etc/apt/sources.list.d/chrome.list \
     && apt-get update \
     && apt-get install -y google-chrome-stable \
     && rm -rf /var/lib/apt/lists/*
 
-# ChromeDriver'ı yükle
-RUN CHROME_DRIVER_VERSION=`curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE` \
-    && wget -O /tmp/chromedriver.zip http://chromedriver.storage.googleapis.com/$CHROME_DRIVER_VERSION/chromedriver_linux64.zip \
-    && unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/ \
-    && rm /tmp/chromedriver.zip \
-    && chmod +x /usr/local/bin/chromedriver
+# ChromeDriver'ı manuel yükleme yerine webdriver-manager kullanacağız
+# Bu sayede Chrome versiyonuyla uyumlu driver otomatik indirilecek
 
 # Çalışma dizini oluştur
 WORKDIR /app
@@ -34,12 +30,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Uygulama dosyalarını kopyala
 COPY . .
 
-# Railway ortam değişkenini ayarla
+# Railway ortam değişkenlerini ayarla
 ENV RAILWAY_ENVIRONMENT=true
 ENV DISPLAY=:99
+ENV PORT=8080
 
 # Port ayarla (Railway için)
 EXPOSE 8080
 
-# Uygulamayı başlat
-CMD ["python", "deneme1.py"] 
+# Flask uygulamasını başlat (deneme1.py değil app.py!)
+CMD ["python", "app.py"] 
