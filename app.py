@@ -275,4 +275,8 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5001))
     debug_mode = not os.environ.get('RAILWAY_ENVIRONMENT', False)
     
-    socketio.run(app, debug=debug_mode, host='0.0.0.0', port=port) 
+    socketio.run(app, 
+                debug=debug_mode, 
+                host='0.0.0.0', 
+                port=port,
+                allow_unsafe_werkzeug=True) 
