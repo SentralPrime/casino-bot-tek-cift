@@ -94,13 +94,45 @@ class BahisButtonClicker:
         
         try:
             # webdriver-manager ile otomatik ChromeDriver yönetimi
-            service = Service(ChromeDriverManager().install())
+            log_with_timestamp("📦 ChromeDriver indiriliyor...")
+            driver_path = ChromeDriverManager().install()
+            log_with_timestamp(f"📍 ChromeDriver path: {driver_path}")
+            
+            # Path içinde gerçek chromedriver binary'sini bul
+            import glob
+            import os
+            
+            if os.path.isdir(driver_path):
+                # Eğer directory döndüyse, içindeki chromedriver binary'sini bul
+                chromedriver_files = glob.glob(os.path.join(driver_path, "**/chromedriver*"), recursive=True)
+                executable_files = [f for f in chromedriver_files if os.access(f, os.X_OK) and not f.endswith('.txt') and not f.endswith('.NOTICES')]
+                
+                if executable_files:
+                    driver_path = executable_files[0]
+                    log_with_timestamp(f"✅ ChromeDriver binary bulundu: {driver_path}")
+                else:
+                    log_with_timestamp(f"❌ ChromeDriver binary bulunamadı. Bulunan dosyalar: {chromedriver_files}")
+                    raise Exception("ChromeDriver binary bulunamadı")
+            
+            # Make sure the file is executable
+            os.chmod(driver_path, 0o755)
+            
+            service = Service(driver_path)
             self.driver = webdriver.Chrome(service=service, options=chrome_options)
             self.driver.set_window_size(1920, 1080)
             log_with_timestamp("✅ Chrome WebDriver başlatıldı (Headless Mode)")
+            
         except Exception as e:
-            log_with_timestamp(f"❌ Chrome WebDriver başlatılırken hata: {str(e)}")
-            raise
+            log_with_timestamp(f"❌ webdriver-manager hatası: {str(e)}")
+            # Fallback: Sistem PATH'indeki chromedriver'ı dene
+            try:
+                log_with_timestamp("🔄 Sistem chromedriver'ı deneniyor...")
+                self.driver = webdriver.Chrome(options=chrome_options)
+                self.driver.set_window_size(1920, 1080)
+                log_with_timestamp("✅ Chrome WebDriver başlatıldı (Sistem PATH)")
+            except Exception as e2:
+                log_with_timestamp(f"❌ Sistem chromedriver da başarısız: {str(e2)}")
+                raise Exception(f"Chrome WebDriver başlatılamadı: webdriver-manager hatası: {e}, sistem hatası: {e2}")
         
     def load_page(self):
         """Sayfayı yükle"""
